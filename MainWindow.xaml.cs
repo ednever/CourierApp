@@ -8,6 +8,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Collections.ObjectModel;
 
 namespace CourierApp;
 
@@ -16,22 +17,17 @@ namespace CourierApp;
 /// </summary>
 public partial class MainWindow : Window
 {
-    private readonly AppDbContext _context;
+    // public ObservableCollection<User> Users { get; set; } = new ObservableCollection<User>();
     public MainWindow()
     {
+        DatabaseHelper.InitializeDatabase();
         InitializeComponent();
-    }
-
-    public MainWindow(AppDbContext context)
-    {
-        InitializeComponent();
-        _context = context;
+        UsersListView.ItemsSource = DatabaseHelper.GetUsers();
     }
 
     private void Button_Click(object sender, RoutedEventArgs e)
     {
-        var user = new User { Name = "Jane Doe", Age = 25 };
-        _context.Users.Add(user);
-        _context.SaveChanges();
+        DatabaseHelper.AddUser("Edgar", 18);
+        
     }
 }
