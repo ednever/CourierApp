@@ -4,12 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CourierApp
+namespace CourierApp.Models
 {
-    public class User
+    public class Phenomenon
     {
-        public int Id { get; set; }
+        public int ID { get; set; }
         public string Name { get; set; }
-        public int Age { get; set; }
     }
 }
