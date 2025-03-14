@@ -8,16 +8,35 @@
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="48*"/>
-            <RowDefinition Height="173*"/>
-            <RowDefinition Height="213*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="401*"/>
-            <ColumnDefinition Width="399*"/>
-        </Grid.ColumnDefinitions>
-        <Label Content="Tellimus" HorizontalAlignment="Left" Margin="252,27,0,0" VerticalAlignment="Top" Grid.Row="1" Height="26" Width="52"/>
-        <Button Content="Add data" HorizontalAlignment="Left" Margin="239,78,0,0" VerticalAlignment="Top" Click="AddDataButton_Click" Grid.Row="1" Height="20" Width="66"/>
-        <Label Content="" HorizontalAlignment="Left" Margin="348,75,0,0" VerticalAlignment="Top" Grid.Row="1" Height="26" Width="10"/>
+        <Button Content="Add Weather Data" Width="150" Height="30" Click="AddDataButton_Click" Grid.Row="0" Margin="5"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="5">
+            <TextBlock Text="Update frequency (minutes):" Margin="10,0,5,0" VerticalAlignment="Center"/>
+            <TextBox x:Name="UpdateFrequencyTextBox" Width="50" Height="25" Text="60" VerticalAlignment="Center"/>
+            <Button Content="Set Frequency" Width="100" Height="30" Click="SetFrequencyButton_Click" Margin="5,0,0,0"/>
+        </StackPanel>
+        <DataGrid x:Name="WeatherDataGrid" AutoGenerateColumns="False" ItemsSource="{Binding WeatherList}" Grid.Row="1" Margin="5">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Station Name" Binding="{Binding StationName}" />
+                <DataGridTextColumn Header="WMO Code" Binding="{Binding WMOCode}" />
+                <DataGridTextColumn Header="Air Temperature (°C)" Binding="{Binding AirTemperature, StringFormat={}{0:F1}}" />
+                <DataGridTextColumn Header="Wind Speed (m/s)" Binding="{Binding WindSpeed, StringFormat={}{0:F1}}" />
+                <DataGridTextColumn Header="Phenomenon" Binding="{Binding Phenomenon.Name}" />
+                <DataGridTextColumn Header="Timestamp" Binding="{Binding Timestamp}" />
+            </DataGrid.Columns>
+            <DataGrid.Background>LightGray</DataGrid.Background>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="White"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="LightBlue"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+            </DataGrid.RowStyle>
+        </DataGrid>
     </Grid>
 </Window>
