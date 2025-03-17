@@ -28,6 +28,7 @@ namespace CourierApp
             services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlite(@"Data Source=..\..\..\MyDatabase.db"));
             services.AddScoped<MainWindow>();
+            services.AddScoped<TestWindow>();
             _serviceProvider = services.BuildServiceProvider();
         }
 
@@ -35,9 +36,13 @@ namespace CourierApp
         {
             base.OnStartup(e);
 
+            //_scope = _serviceProvider.CreateScope();
+            //var mainWindow = _scope.ServiceProvider.GetRequiredService<MainWindow>();
+            //mainWindow.Show();
+
             _scope = _serviceProvider.CreateScope();
-            var mainWindow = _scope.ServiceProvider.GetRequiredService<MainWindow>();
-            mainWindow.Show();
+            var testWindow = _scope.ServiceProvider.GetRequiredService<TestWindow>();
+            testWindow.Show();
         }
         protected override void OnExit(ExitEventArgs e)
         {
