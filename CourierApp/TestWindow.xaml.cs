@@ -11,6 +11,12 @@ namespace CourierApp
     public partial class TestWindow : Window
     {
         private readonly HttpClient _httpClient;
+        private readonly Dictionary<string, string> _cityMapping = new Dictionary<string, string>
+        {
+            { "Tallinn", "Tallinn-Harku" },
+            { "Tartu", "Tartu-Tõravere" },
+            { "Pärnu", "Pärnu" }
+        };
 
         public TestWindow()
         {
@@ -30,7 +36,8 @@ namespace CourierApp
                     return;
                 }
 
-                var city = (CityComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
+                var selectedCity = (CityComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
+                var city = _cityMapping[selectedCity];
                 var transport = (TransportComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
 
                 // Формируем запрос

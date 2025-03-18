@@ -7,6 +7,7 @@ namespace API_server.Data
     {
         public DbSet<Weather> Weather { get; set; }
         public DbSet<Phenomenon> Phenomenon { get; set; }
+        public DbSet<City> City { get; set; }
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
     }
 }

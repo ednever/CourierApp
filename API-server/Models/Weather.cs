@@ -15,8 +15,6 @@ namespace API_server.Models
         public decimal WindSpeed { get; set; }
         public int PhenomenonID { get; set; }
         public int Timestamp { get; set; }
-
-        // Навигационное свойство (опционально)
         public Phenomenon Phenomenon { get; set; }
     }
 }
