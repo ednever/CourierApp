@@ -51,15 +51,33 @@ namespace CourierApp
 
                 // Отправляем запрос к API
                 var response = await _httpClient.PostAsync("api/Delivery/calculate", content);
-                response.EnsureSuccessStatusCode();
+                //response.EnsureSuccessStatusCode();
+
+                //// Обрабатываем ответ
+                //var jsonResponse = await response.Content.ReadAsStringAsync();
+                //var result = JsonSerializer.Deserialize<DeliveryResponse>(jsonResponse);
+
+                //// Отображаем результат
+                //ResultTextBlock.Text = $"Result: {result.Message} Cost: {result.Cost} EUR";
 
                 // Обрабатываем ответ
-                var jsonResponse = await response.Content.ReadAsStringAsync();
-                var result = JsonSerializer.Deserialize<DeliveryResponse>(jsonResponse);
+                string resultText;
+                if (response.IsSuccessStatusCode)
+                {
+                    // Успешный ответ (статус 200 OK)
+                    var jsonResponse = await response.Content.ReadAsStringAsync();
+                    var result = JsonSerializer.Deserialize<DeliveryResponse>(jsonResponse);
+                    resultText = $"Result: {result.Message} Cost: {result.Cost} EUR";
+                }
+                else
+                {
+                    // Обработка ошибки (например, BadRequest с кодом 400)
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    resultText = $"Error: {errorMessage}";
+                }
 
                 // Отображаем результат
-                ResultTextBlock.Text = $"Result: {result.Message} Cost: {result.Cost} EUR";
-                // ResultTextBlock.Text = jsonResponse;
+                ResultTextBlock.Text = resultText;
             }
             catch (Exception ex)
             {

@@ -46,16 +46,17 @@ namespace API_server.Controllers
 
             decimal weatherSurcharge = 0m;
 
-            // Проверяем погоду только для самокатов и велосипедов
-            if (request.Transport == "Scooter" || request.Transport == "Bicycle")
-            {
-                // Получаем последнюю запись о погоде для города
-                var latestWeather = _context.Weather
-                    .Where(w => w.StationName == request.City)
-                    .OrderByDescending(w => w.Timestamp)
-                    .FirstOrDefault();
+            // Получаем последнюю запись о погоде для города
+            var latestWeather = _context.Weather
+                .Where(w => w.StationName == request.City)
+                .OrderByDescending(w => w.Timestamp)
+                .FirstOrDefault();
 
-                if (latestWeather != null)
+            if (latestWeather != null)
+            {
+
+                // Проверяем погоду для самокатов и велосипедов
+                if (request.Transport == "Scooter" || request.Transport == "Bicycle")
                 {
                     decimal temperature = latestWeather.AirTemperature;
                     if (temperature < -10m)
@@ -65,6 +66,20 @@ namespace API_server.Controllers
                     else if (temperature >= -10m && temperature <= 0m)
                     {
                         weatherSurcharge = 0.5m; // Доплата 0.5€ при температуре от -10°C до 0°C
+                    }                
+                }
+
+                // Проверка скорости ветра только для велосипедов
+                if (request.Transport == "Bicycle")
+                {
+                    decimal windSpeed = latestWeather.WindSpeed;
+                    if (windSpeed > 20m)
+                    {
+                        return BadRequest("Bicycle delivery is prohibited due to wind speed exceeding 20 m/s.");
+                    }
+                    else if (windSpeed >= 10m && windSpeed <= 20m)
+                    {
+                        weatherSurcharge += 0.5m; // Доплата 0.5€ при скорости ветра от 10 до 20 м/с
                     }
                 }
             }
