@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace CourierApp.Migrations
+namespace API_server.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CourierApp.Models
+namespace API_server.Models
 {
     public class Phenomenon
     {

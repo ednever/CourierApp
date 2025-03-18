@@ -1,35 +1,20 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
+﻿using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+
 
 namespace CourierApp
 {
-    /// <summary>
-    /// Interaction logic for TestWindow.xaml
-    /// </summary>
     public partial class TestWindow : Window
     {
-        private readonly IServiceProvider _serviceProvider;
         private readonly HttpClient _httpClient;
 
-        public TestWindow(IServiceProvider serviceProvider)
+        public TestWindow()
         {
             InitializeComponent();
-            _serviceProvider = serviceProvider;
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri("https://localhost:7148/"); // Укажите ваш URL API
         }
@@ -73,14 +58,6 @@ namespace CourierApp
             {
                 MessageBox.Show($"Error: {ex.Message}");
             }
-        }
-
-        private void BackButton_Click(object sender, RoutedEventArgs e)
-        {
-            using var scope = _serviceProvider.CreateScope();
-            var mainWindow = scope.ServiceProvider.GetRequiredService<MainWindow>();
-            mainWindow.Show();
-            Close();
         }
     }
 
