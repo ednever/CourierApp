@@ -58,6 +58,7 @@ namespace API_server.Controllers
                 // Проверяем погоду для самокатов и велосипедов
                 if (request.Transport == "Scooter" || request.Transport == "Bicycle")
                 {
+                    // Проверяем температуру (ATEF)
                     decimal temperature = latestWeather.AirTemperature;
                     if (temperature < -10m)
                     {
@@ -66,10 +67,36 @@ namespace API_server.Controllers
                     else if (temperature >= -10m && temperature <= 0m)
                     {
                         weatherSurcharge = 0.5m; // Доплата 0.5€ при температуре от -10°C до 0°C
-                    }                
+                    }
+
+                    // Проверка погодных явлений (WPEF)
+                    var phenomenon = _context.Phenomenon
+                        .FirstOrDefault(p => p.ID == latestWeather.PhenomenonID);
+                    if (phenomenon != null)
+                    {
+                        string phenomenonName = phenomenon?.Name?.ToLower();
+                        if (!string.IsNullOrEmpty(phenomenonName))
+                        {
+                            var snowPhenomena = new[] { "light snow shower", "moderate snow shower", "heavy snow shower", "light sleet", "moderate sleet", "light snowfall", "moderate snowfall", "heavy snowfall" };
+                            var rainPhenomena = new[] { "light shower", "moderate shower", "heavy shower", "light rain", "moderate rain", "heavy rain" };
+                            var prohibitedPhenomena = new[] { "glaze", "hail" };
+                            if (prohibitedPhenomena.Contains(phenomenonName))
+                            {
+                                return BadRequest($"{request.Transport} delivery is prohibited due to {phenomenonName}.");
+                            }
+                            else if (snowPhenomena.Contains(phenomenonName))
+                            {
+                                weatherSurcharge += 1m; // Доплата 1€ для снежных явлений
+                            }
+                            else if (rainPhenomena.Contains(phenomenonName))
+                            {
+                                weatherSurcharge += 0.5m; // Доплата 0.5€ для дождевых явлений
+                            }
+                        }
+                    }
                 }
 
-                // Проверка скорости ветра только для велосипедов
+                // Проверка скорости ветра только для велосипедов (WSEF)
                 if (request.Transport == "Bicycle")
                 {
                     decimal windSpeed = latestWeather.WindSpeed;
