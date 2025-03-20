@@ -11,73 +11,40 @@ namespace API_server.Controllers
     [ApiController]
     public class WeatherController : Controller
     {
-        private readonly AppDbContext _context;
-        public WeatherController(AppDbContext context)
+        private readonly IWeatherDataService _weatherDataService;
+        private readonly IWeatherUpdateFrequencyService _weatherUpdateFrequencyService;
+
+        public WeatherController(IWeatherDataService weatherDataService, IWeatherUpdateFrequencyService weatherUpdateFrequencyService)
         {
-            _context = context;
+            _weatherDataService = weatherDataService;
+            _weatherUpdateFrequencyService = weatherUpdateFrequencyService;
         }
 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Weather>>> GetWeatherData()
         {
-            return await _context.Weather.ToListAsync();
+            return Ok(await _weatherDataService.WeatherDataToList());
         }
 
         [HttpPost]
-        public async Task<ActionResult<IEnumerable<Weather>>> LoadWeatherData()
+        public async Task<ActionResult<Weather>> LoadWeatherData()
         {
-            //_context.Weather.Add(weather);
-            //await _context.SaveChangesAsync();
-            //return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
-            await FetchAndSaveWeatherData();
-            return await _context.Weather.ToListAsync();
+            await _weatherDataService.FetchAndSaveWeatherData();
+            return Ok();
         }
 
-        private async Task FetchAndSaveWeatherData()
+        [HttpPost("setfrequency")]
+        public ActionResult SetFrequency([FromQuery] int minutes)
         {
-            // Список станций, которые нас интересуют
-            var targetStations = new[] { "Tallinn-Harku", "Tartu-Tõravere", "Pärnu" };
-
-            // Загружаем XML с помощью HttpClient
-            using var client = new HttpClient();
-            var xmlString = await client.GetStringAsync("https://www.ilmateenistus.ee/ilma_andmed/xml/observations.php");
-
-            // Парсим XML
-            var doc = XDocument.Parse(xmlString);
-            var timestamp = long.Parse(doc.Root.Attribute("timestamp").Value);
-
-            // Извлекаем данные для нужных станций
-            var weatherData = doc.Descendants("station")
-                .Where(s => targetStations.Contains(s.Element("name")?.Value))
-                .Select(s => new
-                {
-                    StationName = s.Element("name")?.Value,
-                    WMOCode = int.Parse(s.Element("wmocode")?.Value ?? "0"),
-                    AirTemperature = decimal.Parse(s.Element("airtemperature")?.Value ?? "0", System.Globalization.CultureInfo.InvariantCulture),
-                    WindSpeed = decimal.Parse(s.Element("windspeed")?.Value ?? "0", System.Globalization.CultureInfo.InvariantCulture),
-                    Phenomenon = s.Element("phenomenon")?.Value,
-                })
-                .ToList();
-
-            foreach (var data in weatherData)
+            try
             {
-                // Проверяем, существует ли явление в базе, или добавляем новое
-                var phenomenon = _context.Phenomenon.FirstOrDefault(p => p.Name == data.Phenomenon);
-
-                // Добавляем погодные данные
-                var weather = new Weather
-                {
-                    StationName = data.StationName,
-                    WMOCode = data.WMOCode,
-                    AirTemperature = data.AirTemperature,
-                    WindSpeed = data.WindSpeed,
-                    PhenomenonID = phenomenon.ID,
-                    Timestamp = (int)timestamp
-                };
-                _context.Weather.Add(weather);
+                _weatherUpdateFrequencyService.SetUpdateFrequency(minutes);
+                return Ok(new { Message = $"Update frequency set to {minutes} minutes." });
             }
-
-            await _context.SaveChangesAsync();
+            catch (ArgumentException ex)
+            {
+                return BadRequest();
+            }
         }
     }
 }

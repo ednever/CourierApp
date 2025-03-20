@@ -33,5 +33,12 @@
         <Button x:Name="CalculateButton" Content="Calculate Cost" Click="CalculateButton_Click" Margin="120,133,569,244"/>
         <TextBlock x:Name="ResultTextBlock" Text="Result: " FontSize="14" Margin="10,0,10,0" VerticalAlignment="Center" Height="19"/>
 
+        <!-- Изменение частоты запроса -->
+        <TextBlock Text="Weather data request configuration" FontSize="16" FontWeight="Bold" Margin="464,10,17,353"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="457,52,17,307">
+            <TextBlock Text="Update frequency (minutes):" Margin="10,0,5,0" VerticalAlignment="Center"/>
+            <TextBox x:Name="UpdateFrequencyTextBox" Width="50" Height="25" Text="60" VerticalAlignment="Center"/>
+            <Button Content="Set Frequency" Width="100" Height="30" Click="SetFrequencyButton_Click" Margin="5,0,0,0"/>
+        </StackPanel>
     </Grid>
 </Window>

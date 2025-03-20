@@ -51,14 +51,6 @@ namespace CourierApp
 
                 // Отправляем запрос к API
                 var response = await _httpClient.PostAsync("api/Delivery/calculate", content);
-                //response.EnsureSuccessStatusCode();
-
-                //// Обрабатываем ответ
-                //var jsonResponse = await response.Content.ReadAsStringAsync();
-                //var result = JsonSerializer.Deserialize<DeliveryResponse>(jsonResponse);
-
-                //// Отображаем результат
-                //ResultTextBlock.Text = $"Result: {result.Message} Cost: {result.Cost} EUR";
 
                 // Обрабатываем ответ
                 string resultText;
@@ -82,6 +74,31 @@ namespace CourierApp
             catch (Exception ex)
             {
                 MessageBox.Show($"Error: {ex.Message}");
+            }
+        }
+        private async void SetFrequencyButton_Click(object sender, RoutedEventArgs e) 
+        {
+            if (int.TryParse(UpdateFrequencyTextBox.Text, out int minutes) && minutes > 0)
+            {
+                // Формируем URL с параметром в строке запроса
+                var url = $"api/Weather/setfrequency?minutes={minutes}";
+
+                // Отправляем POST-запрос без тела
+                var response = await _httpClient.PostAsync(url, null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Update frequency set successfully.");
+                }
+                else
+                {
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                    MessageBox.Show($"Error: {errorMessage}");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please enter a valid number of minutes greater than 0.");
             }
         }
     }
