@@ -1,0 +1,40 @@
+﻿<Window x:Class="CourierApp.AdminWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CourierApp"
+        mc:Ignorable="d"
+        Title="AdminWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Text="Base fee management" FontSize="20" FontWeight="Bold" Margin="20,15,539,379" Grid.RowSpan="2"/>
+        <StackPanel Orientation="Horizontal" Margin="15,55,648,335">
+            <Button Content="Add New" Click="AddButton_Click" Margin="5"/>
+            <Button Content="Refresh" Click="RefreshButton_Click" Margin="5"/>
+        </StackPanel>
+
+        <DataGrid x:Name="tariffsGrid" Margin="20,100,327,0" 
+                  AutoGenerateColumns="False" IsReadOnly="False"
+                  CellEditEnding="TariffsGrid_CellEditEnding">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True"/>
+                <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                <DataGridTextColumn Header="Car Price" Binding="{Binding PriceForCar}"/>
+                <DataGridTextColumn Header="Scooter Price" Binding="{Binding PriceForScooter}"/>
+                <DataGridTextColumn Header="Bicycle Price" Binding="{Binding PriceForBicycle}"/>
+                <DataGridTemplateColumn>
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Button Content="Delete" Click="DeleteButton_Click" 
+                                   Tag="{Binding Id}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>

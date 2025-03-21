@@ -9,7 +9,7 @@ namespace API_server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class WeatherController : Controller
+    public class WeatherController : ControllerBase
     {
         private readonly IWeatherDataService _weatherDataService;
         private readonly IWeatherUpdateFrequencyService _weatherUpdateFrequencyService;

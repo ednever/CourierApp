@@ -1,14 +1,17 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 
 
 namespace CourierApp
 {
-    public partial class TestWindow : Window
+    public partial class MainWindow : Window
     {
         private readonly HttpClient _httpClient;
         private readonly Dictionary<string, string> _cityMapping = new Dictionary<string, string>
@@ -17,8 +20,9 @@ namespace CourierApp
             { "Tartu", "Tartu-Tõravere" },
             { "Pärnu", "Pärnu" }
         };
+        private string _selectedTransport;
 
-        public TestWindow()
+        public MainWindow()
         {
             InitializeComponent();
             _httpClient = new HttpClient();
@@ -30,7 +34,7 @@ namespace CourierApp
             try
             {
                 // Проверяем, что пользователь выбрал город и транспорт
-                if (CityComboBox.SelectedItem == null || TransportComboBox.SelectedItem == null)
+                if (CityComboBox.SelectedItem == null || _selectedTransport == null)
                 {
                     MessageBox.Show("Please select both a city and a transport type.");
                     return;
@@ -38,7 +42,7 @@ namespace CourierApp
 
                 var selectedCity = (CityComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
                 var city = _cityMapping[selectedCity];
-                var transport = (TransportComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
+                var transport = _selectedTransport;
 
                 // Формируем запрос
                 var request = new
@@ -101,9 +105,31 @@ namespace CourierApp
                 MessageBox.Show("Please enter a valid number of minutes greater than 0.");
             }
         }
+        private void OpenAdminWindowButton_Click(object sender, RoutedEventArgs e)
+        {
+            var adminWindow = new AdminWindow();
+            adminWindow.ShowDialog();
+        }
+        private void TransportBorder_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            var border = sender as Border;
+            if (border == null) return;
+
+            // Сбрасываем выделение всех квадратов
+            CarBorder.BorderBrush = Brushes.Transparent;
+            ScooterBorder.BorderBrush = Brushes.Transparent;
+            BicycleBorder.BorderBrush = Brushes.Transparent;
+
+            // Выделяем выбранный квадрат
+            border.BorderBrush = Brushes.Blue; // Цвет выделения
+            border.BorderThickness = new Thickness(3);
+
+            // Сохраняем выбранный транспорт
+            _selectedTransport = border.Tag.ToString();
+        }
     }
 
-    // Классы для десериализации ответа от API
+    // Класс для десериализации ответа от API
     public class DeliveryResponse
     {
         [JsonPropertyName("message")]
