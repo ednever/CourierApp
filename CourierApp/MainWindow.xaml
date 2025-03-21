@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CourierApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="1000">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -15,7 +15,7 @@
         <TextBlock Text="Delivery Cost Calculator" FontSize="20" FontWeight="Bold" Margin="20,10,515,353" Grid.Row="0"/>
         <!-- Выбор города -->
         <TextBlock Text="Select City:" Margin="20,63,685,309" FontSize="14"/>
-        <ComboBox x:Name="CityComboBox" Margin="101,62,588,310">
+        <ComboBox x:Name="CityComboBox" Margin="101,62,787,310">
             <ComboBoxItem Content="Tallinn"/>
             <ComboBoxItem Content="Tartu"/>
             <ComboBoxItem Content="Pärnu"/>
@@ -57,18 +57,64 @@
         </StackPanel>
 
         <!-- Кнопка для запроса и отображение результата -->
-        <Button x:Name="CalculateButton" Content="Calculate Cost" Click="CalculateButton_Click" Margin="101,222,588,155"/>
-        <TextBlock x:Name="ResultTextBlock" Text="Result: " FontSize="14" Margin="20,260,0,0" VerticalAlignment="Top" Height="19"/>
+        <Button x:Name="CalculateButton" Content="Calculate Cost" Click="CalculateButton_Click" Margin="101,222,787,155"/>
+        <TextBlock x:Name="ResultTextBlock" Text="Result: " FontSize="14" Margin="20,260,515,0" VerticalAlignment="Top" Height="92" TextWrapping="Wrap"/>
 
         <!-- Изменение частоты запроса -->
-        <TextBlock Text="Weather data request configuration" FontSize="16" FontWeight="Bold" Margin="464,10,17,353"/>
-        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="457,52,17,307">
+        <TextBlock Text="Weather data request configuration" FontSize="16" FontWeight="Bold" Margin="609,249,80,114"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="600,291,65,68">
             <TextBlock Text="Update frequency (minutes):" Margin="10,0,5,0" VerticalAlignment="Center"/>
             <TextBox x:Name="UpdateFrequencyTextBox" Width="50" Height="25" Text="60" VerticalAlignment="Center"/>
             <Button Content="Set Frequency" Width="100" Height="30" Click="SetFrequencyButton_Click" Margin="5,0,0,0"/>
         </StackPanel>
 
         <!-- Кнопка для открытия нового окна -->
-        <Button x:Name="OpenThirdWindowButton" Content="Open Admin Window" Height="30" Click="OpenAdminWindowButton_Click" Margin="464,114,202,253"/>
+        <Button x:Name="OpenThirdWindowButton" Content="Open Admin Window" Height="30" Click="OpenAdminWindowButton_Click" Margin="19,357,787,10"/>
+
+        <!-- Таблица для отображения данных погоды -->
+        <Border Margin="308,14,0,171" BorderBrush="Gray" BorderThickness="1" CornerRadius="5" HorizontalAlignment="Left" Width="628">
+            <StackPanel Margin="9,9,9,-9">
+                <TextBlock Text="Weather (Update every HH:15:00)" FontSize="16" FontWeight="Bold" Margin="10,5" HorizontalAlignment="Center"/>
+                <DataGrid x:Name="WeatherDataGrid" AutoGenerateColumns="False" Width="545" Height="150" Margin="5"
+                          CanUserAddRows="False" IsReadOnly="True" GridLinesVisibility="None" HeadersVisibility="Column" RenderTransformOrigin="0.496,0.482">
+                    <DataGrid.Resources>
+                        <!-- Стили для заголовков (теперь это строки) -->
+                        <Style TargetType="DataGridRowHeader">
+                            <Setter Property="Background" Value="#FF4A90E2"/>
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="FontWeight" Value="Bold"/>
+                            <Setter Property="Padding" Value="5"/>
+                            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+                            <Setter Property="Width" Value="150"/>
+                        </Style>
+                        <!-- Стили для строк -->
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Background" Value="White"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#FFE6F0FA"/>
+                                </Trigger>
+                                <Trigger Property="IsSelected" Value="True">
+                                    <Setter Property="Background" Value="#FFCCE4F7"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                        <!-- Стили для ячеек -->
+                        <Style TargetType="DataGridCell">
+                            <Setter Property="Padding" Value="5"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                        </Style>
+                    </DataGrid.Resources>
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Station name" Binding="{Binding StationName, StringFormat={}{0:F1}}"/>
+                        <DataGridTextColumn Header="Air Temperature" Binding="{Binding AirTemperature, StringFormat={}{0:F1}}"/>
+                        <DataGridTextColumn Header="Wind Speed" Binding="{Binding WindSpeed, StringFormat={}{0:F1}}"/>
+                        <DataGridTextColumn Header="Phenomenon" Binding="{Binding PhenomenonName}"/>
+                        <DataGridTextColumn Header="Timestamp" Binding="{Binding ConvertedTimestamp}"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </StackPanel>
+        </Border>
     </Grid>
 </Window>

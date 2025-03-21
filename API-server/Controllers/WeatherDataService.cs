@@ -9,17 +9,14 @@ namespace API_server.Controllers
     {
         Task FetchAndSaveWeatherData();
         Task<IEnumerable<Weather>> WeatherDataToList();
-        // void SetUpdateFrequency(int minutes);
     }
     public class WeatherDataService : IWeatherDataService
     {
         private readonly AppDbContext _context;
-        // private readonly WeatherUpdateService _weatherUpdateService;
 
-        public WeatherDataService(AppDbContext context) //, WeatherUpdateService weatherUpdateService
+        public WeatherDataService(AppDbContext context)
         {
             _context = context;
-            //_weatherUpdateService = weatherUpdateService;
         }
 
         public async Task FetchAndSaveWeatherData()
@@ -76,12 +73,12 @@ namespace API_server.Controllers
         }
         public async Task<IEnumerable<Weather>> WeatherDataToList()
         {
-            return await _context.Weather.ToListAsync();
+            var weatherData = await _context.Weather.ToListAsync();
+            foreach (var weather in weatherData)
+            {
+                weather.Phenomenon = await _context.Phenomenon.FirstOrDefaultAsync(p => p.ID == weather.PhenomenonID);
+            }
+            return weatherData;
         }
-        // Метод для изменения частоты обновления
-        //public void SetUpdateFrequency(int minutes)
-        //{
-        //     _weatherUpdateService.SetUpdateInterval(minutes);
-        //}
     }
 }

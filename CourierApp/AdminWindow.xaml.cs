@@ -22,13 +22,13 @@ namespace CourierApp
     public partial class AdminWindow : Window
     {
         private readonly TariffService _tariffService;
-        private ObservableCollection<Tariff> tariffs;
+        private ObservableCollection<Tariff> _tariffs;
         public AdminWindow()
         {
             InitializeComponent();
             _tariffService = new TariffService();
-            tariffs = new ObservableCollection<Tariff>();
-            tariffsGrid.ItemsSource = tariffs;
+            _tariffs = new ObservableCollection<Tariff>();
+            tariffsGrid.ItemsSource = _tariffs;
             tariffsGrid.CellEditEnding += TariffsGrid_CellEditEnding;
             LoadTariffs();
             
@@ -38,10 +38,10 @@ namespace CourierApp
             try
             {
                 var tariffList = await _tariffService.GetAllTariffsAsync();
-                tariffs.Clear();
+                _tariffs.Clear();
                 foreach (var tariff in tariffList)
                 {
-                    tariffs.Add(tariff);
+                    _tariffs.Add(tariff);
                 }
             }
             catch (Exception ex)
@@ -54,7 +54,7 @@ namespace CourierApp
         {
             try
             {
-                var newTariff = new Tariff { Name = "New Tariff" };
+                var newTariff = new Tariff { Name = "New city" };
                 await _tariffService.CreateTariffAsync(newTariff);
                 LoadTariffs();
             }

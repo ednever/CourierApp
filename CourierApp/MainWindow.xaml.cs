@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Net.Http;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -21,12 +23,48 @@ namespace CourierApp
             { "Pärnu", "Pärnu" }
         };
         private string _selectedTransport;
+        private ObservableCollection<WeatherResponse> _weatherResponse;
 
         public MainWindow()
         {
             InitializeComponent();
             _httpClient = new HttpClient();
-            _httpClient.BaseAddress = new Uri("https://localhost:7148/"); // Укажите ваш URL API
+            _httpClient.BaseAddress = new Uri("https://localhost:7148/");
+            _weatherResponse = new ObservableCollection<WeatherResponse>();
+            WeatherDataGrid.ItemsSource = _weatherResponse;
+            LoadWeatherData();
+        }
+        private async void LoadWeatherData()
+        {
+            try
+            {
+                // Отправляем запрос к API
+                var response = await _httpClient.GetAsync("api/Weather");
+
+                // Обрабатываем ответ
+                if (response.IsSuccessStatusCode)
+                {
+                    // Успешный ответ (статус 200 OK)
+                    var jsonResponse = await response.Content.ReadAsStringAsync();
+                    var result = JsonSerializer.Deserialize<List<WeatherResponse>>(jsonResponse);
+
+                    _weatherResponse.Clear();
+                    foreach (var weatherData in result)
+                    {
+                        DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(weatherData.Timestamp);
+                        weatherData.ConvertedTimestamp = dateTimeOffset.ToString("yyyy-MM-dd HH:mm:ss");
+                        _weatherResponse.Add(weatherData);
+                    }
+                }
+                else
+                {
+                    var errorMessage = await response.Content.ReadAsStringAsync();
+                }               
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading weather data: {ex.Message}");
+            }
         }
 
         private async void CalculateButton_Click(object sender, RoutedEventArgs e)
@@ -129,12 +167,35 @@ namespace CourierApp
         }
     }
 
-    // Класс для десериализации ответа от API
+    // Классы для десериализации ответа от API
     public class DeliveryResponse
     {
         [JsonPropertyName("message")]
         public string Message { get; set; }
         [JsonPropertyName("cost")]
         public decimal Cost { get; set; }
+    }
+    public class WeatherResponse
+    {
+        [JsonPropertyName("stationName")]
+        public string StationName { get; set; }
+        [JsonPropertyName("airTemperature")]
+        public decimal AirTemperature { get; set; }
+        [JsonPropertyName("windSpeed")]
+        public decimal WindSpeed { get; set; }
+        [JsonPropertyName("phenomenon")]
+        public PhenomenonResponse Phenomenon { get; set; }
+        [JsonPropertyName("timestamp")]
+        public int Timestamp { get; set; }
+        public string ConvertedTimestamp { get; set; }
+        public string PhenomenonName => Phenomenon?.Name;
+    }
+    public class PhenomenonResponse
+    {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
+
+        [JsonPropertyName("name")]
+        public string Name { get; set; }
     }
 }

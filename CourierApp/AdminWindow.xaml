@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CourierApp"
         mc:Ignorable="d"
-        Title="AdminWindow" Height="450" Width="800">
+        Title="AdminWindow" Height="450" Width="1000">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -17,12 +17,29 @@
             <Button Content="Refresh" Click="RefreshButton_Click" Margin="5"/>
         </StackPanel>
 
-        <DataGrid x:Name="tariffsGrid" Margin="20,100,327,0" 
+        <DataGrid x:Name="tariffsGrid" Margin="20,100,418,161" 
                   AutoGenerateColumns="False" IsReadOnly="False"
                   CellEditEnding="TariffsGrid_CellEditEnding">
+            <DataGrid.Resources>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="Background" Value="White"/>
+                    <Style.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="#FFE6F0FA"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Background" Value="#FFCCE4F7"/>
+                        </Trigger>
+                    </Style.Triggers>
+                </Style>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="Padding" Value="5"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="TextBlock.TextAlignment" Value="Center"/>
+                </Style>
+            </DataGrid.Resources>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="ID" Binding="{Binding Id}" IsReadOnly="True"/>
-                <DataGridTextColumn Header="Name" Binding="{Binding Name}"/>
+                <DataGridTextColumn Header="City" Binding="{Binding Name}"/>
                 <DataGridTextColumn Header="Car Price" Binding="{Binding PriceForCar}"/>
                 <DataGridTextColumn Header="Scooter Price" Binding="{Binding PriceForScooter}"/>
                 <DataGridTextColumn Header="Bicycle Price" Binding="{Binding PriceForBicycle}"/>
