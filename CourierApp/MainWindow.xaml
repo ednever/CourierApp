@@ -61,11 +61,11 @@
         <TextBlock x:Name="ResultTextBlock" Text="Result: " FontSize="14" Margin="20,260,515,0" VerticalAlignment="Top" Height="92" TextWrapping="Wrap"/>
 
         <!-- Изменение частоты запроса -->
-        <TextBlock Text="Weather data request configuration" FontSize="16" FontWeight="Bold" Margin="513,247,80,116"/>
-        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="504,289,20,70">
+        <TextBlock Text="Weather data request configuration" FontSize="16" FontWeight="Bold" Margin="499,246,94,117"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="490,288,34,71">
             <TextBlock Text="Update frequency (minutes):" Margin="10,0,5,0" VerticalAlignment="Center"/>
             <TextBox x:Name="UpdateFrequencyTextBox" Width="50" Height="25" Text="60" VerticalAlignment="Center"/>
-            <Button Content="Set Frequency" Width="146" Height="30" Click="SetFrequencyButton_Click" Margin="5,0,0,0"/>
+            <Button Content="Set Frequency" Width="153" Height="30" Click="SetFrequencyButton_Click" Margin="5,0,0,0"/>
         </StackPanel>
 
         <!-- Кнопка для открытия нового окна -->
@@ -114,7 +114,9 @@
                         <DataGridTextColumn Header="Timestamp" Binding="{Binding ConvertedTimestamp}"/>
                     </DataGrid.Columns>
                 </DataGrid>
+
             </StackPanel>
         </Border>
+        <Button x:Name="LoadData" Content="Load data" Height="20" Click="LoadDataButton_Click" Margin="322,29,492,348" />
     </Grid>
 </Window>

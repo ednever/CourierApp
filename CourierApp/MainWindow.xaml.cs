@@ -31,8 +31,7 @@ namespace CourierApp
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri("https://localhost:7148/");
             _weatherResponse = new ObservableCollection<WeatherResponse>();
-            WeatherDataGrid.ItemsSource = _weatherResponse;
-            LoadWeatherData();
+            WeatherDataGrid.ItemsSource = _weatherResponse;            
         }
         private async void LoadWeatherData()
         {
@@ -65,6 +64,10 @@ namespace CourierApp
             {
                 MessageBox.Show($"Error loading weather data: {ex.Message}");
             }
+        }
+        private async void LoadDataButton_Click(object sender, RoutedEventArgs e)
+        {
+            LoadWeatherData();
         }
 
         private async void CalculateButton_Click(object sender, RoutedEventArgs e)
