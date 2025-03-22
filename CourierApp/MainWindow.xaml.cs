@@ -131,6 +131,8 @@ namespace CourierApp
                 if (response.IsSuccessStatusCode)
                 {
                     MessageBox.Show("Update frequency set successfully.");
+                    await Task.Delay(minutes * 60000);
+                    LoadWeatherData();
                 }
                 else
                 {

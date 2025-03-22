@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CourierApp"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="1000">
+        Title="MainWindow" Height="450" Width="900">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -15,7 +15,7 @@
         <TextBlock Text="Delivery Cost Calculator" FontSize="20" FontWeight="Bold" Margin="20,10,515,353" Grid.Row="0"/>
         <!-- Выбор города -->
         <TextBlock Text="Select City:" Margin="20,63,685,309" FontSize="14"/>
-        <ComboBox x:Name="CityComboBox" Margin="101,62,787,310">
+        <ComboBox x:Name="CityComboBox" Margin="101,62,685,310">
             <ComboBoxItem Content="Tallinn"/>
             <ComboBoxItem Content="Tartu"/>
             <ComboBoxItem Content="Pärnu"/>
@@ -57,22 +57,22 @@
         </StackPanel>
 
         <!-- Кнопка для запроса и отображение результата -->
-        <Button x:Name="CalculateButton" Content="Calculate Cost" Click="CalculateButton_Click" Margin="101,222,787,155"/>
+        <Button x:Name="CalculateButton" Content="Calculate Cost" Click="CalculateButton_Click" Margin="101,222,685,155"/>
         <TextBlock x:Name="ResultTextBlock" Text="Result: " FontSize="14" Margin="20,260,515,0" VerticalAlignment="Top" Height="92" TextWrapping="Wrap"/>
 
         <!-- Изменение частоты запроса -->
-        <TextBlock Text="Weather data request configuration" FontSize="16" FontWeight="Bold" Margin="609,249,80,114"/>
-        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="600,291,65,68">
+        <TextBlock Text="Weather data request configuration" FontSize="16" FontWeight="Bold" Margin="513,247,80,116"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="504,289,20,70">
             <TextBlock Text="Update frequency (minutes):" Margin="10,0,5,0" VerticalAlignment="Center"/>
             <TextBox x:Name="UpdateFrequencyTextBox" Width="50" Height="25" Text="60" VerticalAlignment="Center"/>
-            <Button Content="Set Frequency" Width="100" Height="30" Click="SetFrequencyButton_Click" Margin="5,0,0,0"/>
+            <Button Content="Set Frequency" Width="146" Height="30" Click="SetFrequencyButton_Click" Margin="5,0,0,0"/>
         </StackPanel>
 
         <!-- Кнопка для открытия нового окна -->
-        <Button x:Name="OpenThirdWindowButton" Content="Open Admin Window" Height="30" Click="OpenAdminWindowButton_Click" Margin="19,357,787,10"/>
+        <Button x:Name="OpenThirdWindowButton" Content="Open Admin Window" Height="30" Click="OpenAdminWindowButton_Click" Margin="19,357,685,10"/>
 
         <!-- Таблица для отображения данных погоды -->
-        <Border Margin="308,14,0,171" BorderBrush="Gray" BorderThickness="1" CornerRadius="5" HorizontalAlignment="Left" Width="628">
+        <Border Margin="308,14,0,171" BorderBrush="Gray" BorderThickness="1" CornerRadius="5" HorizontalAlignment="Left" Width="570">
             <StackPanel Margin="9,9,9,-9">
                 <TextBlock Text="Weather (Update every HH:15:00)" FontSize="16" FontWeight="Bold" Margin="10,5" HorizontalAlignment="Center"/>
                 <DataGrid x:Name="WeatherDataGrid" AutoGenerateColumns="False" Width="545" Height="150" Margin="5"
