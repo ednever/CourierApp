@@ -5,6 +5,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Controls;
+using CourierApp.Models;
 
 namespace CourierApp
 {
@@ -136,92 +137,5 @@ namespace CourierApp
                 MessageBox.Show($"Error deleting tariff: {ex.Message}");
             }
         }
-    }
-
-    // Represents a tariff entity with properties for city name and transport prices
-    public class Tariff
-    {
-        [JsonPropertyName("id")]
-        public int Id { get; set; }
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
-        [JsonPropertyName("priceForCar")]
-        public decimal PriceForCar { get; set; }
-        [JsonPropertyName("priceForScooter")]
-        public decimal PriceForScooter { get; set; }
-        [JsonPropertyName("priceForBicycle")]
-        public decimal PriceForBicycle { get; set; }
-    }
-
-    // Provides methods to interact with the tariff API for CRUD operations
-    public class TariffService
-    {
-        private readonly HttpClient _httpClient;
-        private const string BaseUrl = "https://localhost:7148/api/Tariffs/";
-
-        public TariffService()
-        {
-            _httpClient = new HttpClient();
-        }
-
-        /// <summary>
-        /// Retrieves all tariffs from the API.
-        /// </summary>
-        /// <returns>A list of Tariff objects.</returns>
-        public async Task<List<Tariff>> GetAllTariffsAsync()
-        {
-            var response = await _httpClient.GetAsync(BaseUrl);
-            response.EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<List<Tariff>>(content);
-        }
-
-        /// <summary>
-        /// Retrieves a specific tariff by its ID from the API.
-        /// </summary>
-        /// <param name="id">The ID of the tariff to retrieve.</param>
-        /// <returns>The Tariff object corresponding to the specified ID.</returns>
-        public async Task<Tariff> GetTariffByIdAsync(int id)
-        {
-            var response = await _httpClient.GetAsync($"{BaseUrl}{id}");
-            response.EnsureSuccessStatusCode();
-            var content = await response.Content.ReadAsStringAsync();
-            return JsonSerializer.Deserialize<Tariff>(content);
-        }
-
-        /// <summary>
-        /// Creates a new tariff via the API.
-        /// </summary>
-        /// <param name="tariff">The Tariff object to create.</param>
-        public async Task CreateTariffAsync(Tariff tariff)
-        {
-            var json = JsonSerializer.Serialize(tariff);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PostAsync(BaseUrl, content);
-            response.EnsureSuccessStatusCode();
-        }
-
-        /// <summary>
-        /// Updates an existing tariff via the API.
-        /// </summary>
-        /// <param name="id">The ID of the tariff to update.</param>
-        /// <param name="tariff">The updated Tariff object.</param>
-        public async Task UpdateTariffAsync(int id, Tariff tariff)
-        {
-            var json = JsonSerializer.Serialize(tariff);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            var response = await _httpClient.PutAsync($"{BaseUrl}{id}", content);
-            response.EnsureSuccessStatusCode();
-        }
-
-        /// <summary>
-        /// Deletes a tariff by its ID via the API.
-        /// </summary>
-        /// <param name="id">The ID of the tariff to delete.</param>
-        public async Task DeleteTariffAsync(int id)
-        {
-            var response = await _httpClient.DeleteAsync($"{BaseUrl}{id}");
-            response.EnsureSuccessStatusCode();
-        }
-    }
+    } 
 }

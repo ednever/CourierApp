@@ -2,12 +2,11 @@
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-
+using CourierApp.Models;
 
 namespace CourierApp
 {
@@ -157,8 +156,9 @@ namespace CourierApp
         }
         private void OpenAdminWindowButton_Click(object sender, RoutedEventArgs e)
         {
-            var adminWindow = new AdminWindow();
-            adminWindow.ShowDialog();
+            // Open the LoginWindow for authentication to access the AdminWindow
+            var loginWindow = new LoginWindow();
+            loginWindow.ShowDialog();
         }
         private void TransportBorder_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -177,41 +177,5 @@ namespace CourierApp
             // Store the selected transport type
             _selectedTransport = border.Tag.ToString();
         }
-    }
-
-    // Represents the response structure for delivery cost calculations from the API
-    public class DeliveryResponse
-    {
-        [JsonPropertyName("message")]
-        public string Message { get; set; }
-        [JsonPropertyName("cost")]
-        public decimal Cost { get; set; }
-    }
-
-    // Represents the response structure for weather data from the API
-    public class WeatherResponse
-    {
-        [JsonPropertyName("stationName")]
-        public string StationName { get; set; }
-        [JsonPropertyName("airTemperature")]
-        public decimal AirTemperature { get; set; }
-        [JsonPropertyName("windSpeed")]
-        public decimal WindSpeed { get; set; }
-        [JsonPropertyName("phenomenon")]
-        public PhenomenonResponse Phenomenon { get; set; }
-        [JsonPropertyName("timestamp")]
-        public int Timestamp { get; set; }
-        public string ConvertedTimestamp { get; set; }
-        public string PhenomenonName => Phenomenon?.Name;
-    }
-
-    // Represents the response structure for weather phenomenon data from the API
-    public class PhenomenonResponse
-    {
-        [JsonPropertyName("id")]
-        public int Id { get; set; }
-
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
     }
 }
