@@ -1,38 +1,34 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using System.Collections.ObjectModel;
 using System.Net.Http;
-using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace CourierApp
 {
     public partial class AdminWindow : Window
     {
+        // Service for interacting with tariff-related API endpoints
         private readonly TariffService _tariffService;
+
+        // Observable collection for displaying tariffs in the UI
         private ObservableCollection<Tariff> _tariffs;
         public AdminWindow()
         {
             InitializeComponent();
             _tariffService = new TariffService();
             _tariffs = new ObservableCollection<Tariff>();
+
+            // Bind the tariffs collection to the DataGrid
             tariffsGrid.ItemsSource = _tariffs;
             tariffsGrid.CellEditEnding += TariffsGrid_CellEditEnding;
             LoadTariffs();
             
         }
+
+        // Loading tariffs from the API and updating the observable collection
         private async void LoadTariffs()
         {
             try
@@ -54,6 +50,7 @@ namespace CourierApp
         {
             try
             {
+                // Create a new tariff and send it to the server
                 var newTariff = new Tariff { Name = "New city" };
                 await _tariffService.CreateTariffAsync(newTariff);
                 LoadTariffs();
@@ -68,6 +65,8 @@ namespace CourierApp
         {
             LoadTariffs();
         }
+
+        // Handling the event when a cell edit is committed, updating the tariff on the server
         private async void TariffsGrid_CellEditEnding(object sender, DataGridCellEditEndingEventArgs e)
         {
             if (e.EditAction == DataGridEditAction.Commit)
@@ -77,17 +76,17 @@ namespace CourierApp
                     var tariff = e.Row.Item as Tariff;
                     if (tariff != null)
                     {
-                        // Получаем измененное значение
+                        // Retrieve the edited value
                         var editingElement = e.EditingElement as TextBox;
                         if (editingElement != null)
                         {
                             string newValue = editingElement.Text;
                             string columnName = e.Column.Header.ToString();
 
-                            // Проверяем, какое поле было изменено и обновляем соответствующее свойство
+                            // Update the appropriate tariff property based on the edited column
                             switch (columnName)
                             {
-                                case "Name":
+                                case "City":
                                     tariff.Name = newValue;
                                     break;
                                 case "Car Price":
@@ -110,7 +109,7 @@ namespace CourierApp
                                     break;
                             }
 
-                            // Отправляем обновленный тариф на сервер
+                            // Send the updated tariff to the server
                             await _tariffService.UpdateTariffAsync(tariff.Id, tariff);
                         }
                     }
@@ -138,7 +137,8 @@ namespace CourierApp
             }
         }
     }
-    // Класс для десериализации ответа от API
+
+    // Represents a tariff entity with properties for city name and transport prices
     public class Tariff
     {
         [JsonPropertyName("id")]
@@ -152,6 +152,8 @@ namespace CourierApp
         [JsonPropertyName("priceForBicycle")]
         public decimal PriceForBicycle { get; set; }
     }
+
+    // Provides methods to interact with the tariff API for CRUD operations
     public class TariffService
     {
         private readonly HttpClient _httpClient;
@@ -162,7 +164,10 @@ namespace CourierApp
             _httpClient = new HttpClient();
         }
 
-        // GET: api/Tariffs
+        /// <summary>
+        /// Retrieves all tariffs from the API.
+        /// </summary>
+        /// <returns>A list of Tariff objects.</returns>
         public async Task<List<Tariff>> GetAllTariffsAsync()
         {
             var response = await _httpClient.GetAsync(BaseUrl);
@@ -171,7 +176,11 @@ namespace CourierApp
             return JsonSerializer.Deserialize<List<Tariff>>(content);
         }
 
-        // GET: api/Tariffs/5
+        /// <summary>
+        /// Retrieves a specific tariff by its ID from the API.
+        /// </summary>
+        /// <param name="id">The ID of the tariff to retrieve.</param>
+        /// <returns>The Tariff object corresponding to the specified ID.</returns>
         public async Task<Tariff> GetTariffByIdAsync(int id)
         {
             var response = await _httpClient.GetAsync($"{BaseUrl}{id}");
@@ -180,7 +189,10 @@ namespace CourierApp
             return JsonSerializer.Deserialize<Tariff>(content);
         }
 
-        // POST: api/Tariffs
+        /// <summary>
+        /// Creates a new tariff via the API.
+        /// </summary>
+        /// <param name="tariff">The Tariff object to create.</param>
         public async Task CreateTariffAsync(Tariff tariff)
         {
             var json = JsonSerializer.Serialize(tariff);
@@ -189,7 +201,11 @@ namespace CourierApp
             response.EnsureSuccessStatusCode();
         }
 
-        // PUT: api/Tariffs/5
+        /// <summary>
+        /// Updates an existing tariff via the API.
+        /// </summary>
+        /// <param name="id">The ID of the tariff to update.</param>
+        /// <param name="tariff">The updated Tariff object.</param>
         public async Task UpdateTariffAsync(int id, Tariff tariff)
         {
             var json = JsonSerializer.Serialize(tariff);
@@ -198,7 +214,10 @@ namespace CourierApp
             response.EnsureSuccessStatusCode();
         }
 
-        // DELETE: api/Tariffs/5
+        /// <summary>
+        /// Deletes a tariff by its ID via the API.
+        /// </summary>
+        /// <param name="id">The ID of the tariff to delete.</param>
         public async Task DeleteTariffAsync(int id)
         {
             var response = await _httpClient.DeleteAsync($"{BaseUrl}{id}");

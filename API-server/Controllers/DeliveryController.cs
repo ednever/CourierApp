@@ -1,8 +1,6 @@
 ﻿using API_server.Data;
 using API_server.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 
 namespace API_server.Controllers
 {

@@ -18,21 +18,21 @@ namespace API_server.Controllers
         {
             _context = context;
         }
-
+        // Weather data fetching from ilmateenistus.ee XML source and saving it to the database
         public async Task FetchAndSaveWeatherData()
         {
-            // Список станций, которые нас интересуют
+            // List of stations to filter weather data for
             var targetStations = new[] { "Tallinn-Harku", "Tartu-Tõravere", "Pärnu" };
 
-            // Загружаем XML с помощью HttpClient
+            // Load XML data using HttpClient
             using var client = new HttpClient();
             var xmlString = await client.GetStringAsync("https://www.ilmateenistus.ee/ilma_andmed/xml/observations.php");
 
-            // Парсим XML
+            // Parse the XML document
             var doc = XDocument.Parse(xmlString);
             var timestamp = long.Parse(doc.Root.Attribute("timestamp").Value);
 
-            // Извлекаем данные для нужных станций
+            // Extract weather data for the specified stations
             var weatherData = doc.Descendants("station")
                 .Where(s => targetStations.Contains(s.Element("name")?.Value))
                 .Select(s => new
@@ -47,7 +47,7 @@ namespace API_server.Controllers
 
             foreach (var data in weatherData)
             {
-                // Проверяем, существует ли явление в базе, или добавляем новое
+                // Check if the phenomenon exists in the database; if not, add it
                 var phenomenon = _context.Phenomenon.FirstOrDefault(p => p.Name == data.Phenomenon);
                 if (phenomenon == null && !string.IsNullOrEmpty(data.Phenomenon))
                 {
@@ -56,7 +56,7 @@ namespace API_server.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                // Добавляем погодные данные
+                // Create and add weather data entry
                 var weather = new Weather
                 {
                     StationName = data.StationName,
@@ -69,8 +69,11 @@ namespace API_server.Controllers
                 _context.Weather.Add(weather);
             }
 
+            // Save all changes to the database
             await _context.SaveChangesAsync();
         }
+
+        // Retrieving all weather data from the database and including related phenomenon information
         public async Task<IEnumerable<Weather>> WeatherDataToList()
         {
             var weatherData = await _context.Weather.ToListAsync();

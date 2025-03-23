@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Net.Http;
-using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -16,6 +14,8 @@ namespace CourierApp
     public partial class MainWindow : Window
     {
         private readonly HttpClient _httpClient;
+
+        // Dictionary mapping city names to weather station names
         private readonly Dictionary<string, string> _cityMapping = new Dictionary<string, string>
         {
             { "Tallinn", "Tallinn-Harku" },
@@ -23,6 +23,8 @@ namespace CourierApp
             { "Pärnu", "Pärnu" }
         };
         private string _selectedTransport;
+
+        // Observable collection for displaying weather data in the UI
         private ObservableCollection<WeatherResponse> _weatherResponse;
 
         public MainWindow()
@@ -31,25 +33,29 @@ namespace CourierApp
             _httpClient = new HttpClient();
             _httpClient.BaseAddress = new Uri("https://localhost:7148/");
             _weatherResponse = new ObservableCollection<WeatherResponse>();
+
+            // Bind the weather data collection to the DataGrid
             WeatherDataGrid.ItemsSource = _weatherResponse;            
         }
+
+        // Loading weather data from the API and updating the observable collection
         private async void LoadWeatherData()
         {
             try
             {
-                // Отправляем запрос к API
+                // Send a GET request to the API
                 var response = await _httpClient.GetAsync("api/Weather");
 
-                // Обрабатываем ответ
+                // Process the response
                 if (response.IsSuccessStatusCode)
                 {
-                    // Успешный ответ (статус 200 OK)
                     var jsonResponse = await response.Content.ReadAsStringAsync();
                     var result = JsonSerializer.Deserialize<List<WeatherResponse>>(jsonResponse);
 
                     _weatherResponse.Clear();
                     foreach (var weatherData in result)
                     {
+                        // Convert Unix timestamp to a readable format
                         DateTimeOffset dateTimeOffset = DateTimeOffset.FromUnixTimeSeconds(weatherData.Timestamp);
                         weatherData.ConvertedTimestamp = dateTimeOffset.ToString("yyyy-MM-dd HH:mm:ss");
                         _weatherResponse.Add(weatherData);
@@ -70,22 +76,23 @@ namespace CourierApp
             LoadWeatherData();
         }
 
+        // Sending a request to calculate delivery cost based on the selected city and transport
         private async void CalculateButton_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                // Проверяем, что пользователь выбрал город и транспорт
+                // Validate that a city and transport type have been selected
                 if (CityComboBox.SelectedItem == null || _selectedTransport == null)
                 {
                     MessageBox.Show("Please select both a city and a transport type.");
                     return;
                 }
 
-                var selectedCity = (CityComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
-                var city = _cityMapping[selectedCity];
+                var selectedCity = (CityComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();                
+                var city = _cityMapping[selectedCity]; // Map the selected city to its station name
                 var transport = _selectedTransport;
 
-                // Формируем запрос
+                // Create the request
                 var request = new
                 {
                     city,
@@ -94,26 +101,24 @@ namespace CourierApp
                 var jsonRequest = JsonSerializer.Serialize(request);
                 var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
 
-                // Отправляем запрос к API
+                // Send a POST request to the API
                 var response = await _httpClient.PostAsync("api/Delivery/calculate", content);
 
-                // Обрабатываем ответ
+                // Process the response
                 string resultText;
                 if (response.IsSuccessStatusCode)
-                {
-                    // Успешный ответ (статус 200 OK)
+                {                    
                     var jsonResponse = await response.Content.ReadAsStringAsync();
                     var result = JsonSerializer.Deserialize<DeliveryResponse>(jsonResponse);
                     resultText = $"Result: {result.Message} Cost: {result.Cost} EUR";
                 }
                 else
-                {
-                    // Обработка ошибки (например, BadRequest с кодом 400)
+                {                    
                     var errorMessage = await response.Content.ReadAsStringAsync();
                     resultText = $"Error: {errorMessage}";
                 }
 
-                // Отображаем результат
+                // Display the result in the UI
                 ResultTextBlock.Text = resultText;
             }
             catch (Exception ex)
@@ -121,21 +126,23 @@ namespace CourierApp
                 MessageBox.Show($"Error: {ex.Message}");
             }
         }
+
+        // Sending a request to set the weather data update frequency and reloading data after the specified interval
         private async void SetFrequencyButton_Click(object sender, RoutedEventArgs e) 
         {
             if (int.TryParse(UpdateFrequencyTextBox.Text, out int minutes) && minutes > 0)
             {
-                // Формируем URL с параметром в строке запроса
+                // Construct the URL with the query parameter
                 var url = $"api/Weather/setfrequency?minutes={minutes}";
 
-                // Отправляем POST-запрос без тела
+                // Send a POST request without a body
                 var response = await _httpClient.PostAsync(url, null);
 
                 if (response.IsSuccessStatusCode)
                 {
                     MessageBox.Show("Update frequency set successfully.");
-                    await Task.Delay(minutes * 60000);
-                    LoadWeatherData();
+                    await Task.Delay(minutes * 60000); 
+                    LoadWeatherData(); // Reload weather data after the delay
                 }
                 else
                 {
@@ -158,21 +165,21 @@ namespace CourierApp
             var border = sender as Border;
             if (border == null) return;
 
-            // Сбрасываем выделение всех квадратов
+            // Reset the border of all transport options
             CarBorder.BorderBrush = Brushes.Transparent;
             ScooterBorder.BorderBrush = Brushes.Transparent;
             BicycleBorder.BorderBrush = Brushes.Transparent;
 
-            // Выделяем выбранный квадрат
-            border.BorderBrush = Brushes.Blue; // Цвет выделения
+            // Highlight the selected transport option
+            border.BorderBrush = Brushes.Blue;
             border.BorderThickness = new Thickness(3);
 
-            // Сохраняем выбранный транспорт
+            // Store the selected transport type
             _selectedTransport = border.Tag.ToString();
         }
     }
 
-    // Классы для десериализации ответа от API
+    // Represents the response structure for delivery cost calculations from the API
     public class DeliveryResponse
     {
         [JsonPropertyName("message")]
@@ -180,6 +187,8 @@ namespace CourierApp
         [JsonPropertyName("cost")]
         public decimal Cost { get; set; }
     }
+
+    // Represents the response structure for weather data from the API
     public class WeatherResponse
     {
         [JsonPropertyName("stationName")]
@@ -195,6 +204,8 @@ namespace CourierApp
         public string ConvertedTimestamp { get; set; }
         public string PhenomenonName => Phenomenon?.Name;
     }
+
+    // Represents the response structure for weather phenomenon data from the API
     public class PhenomenonResponse
     {
         [JsonPropertyName("id")]

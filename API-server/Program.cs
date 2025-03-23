@@ -5,25 +5,26 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Настройка базы данных
+// Configure the database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite("Data Source=Data/MyDatabase.db"));
 
-// Настройка конфигурации
+// Configure services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
+    // Include XML documentation for Swagger
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    options.IncludeXmlComments(xmlPath); // Подключаем XML-документацию
+    options.IncludeXmlComments(xmlPath); // Enable XML comments for API documentation
 });
 
-// BackgroundService registration 
+// Register scoped services for dependency injection
 builder.Services.AddScoped<IWeatherDataService, WeatherDataService>();
 builder.Services.AddScoped<IWeatherUpdateFrequencyService, WeatherUpdateFrequencyService>();
 
-// Регистрация WeatherUpdateService
+// Register WeatherUpdateService as a singleton and hosted service
 builder.Services.AddSingleton<WeatherUpdateService>();
 builder.Services.AddHostedService(provider => provider.GetRequiredService<WeatherUpdateService>());
 
@@ -31,17 +32,18 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
+    // Enable Swagger in development environment
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Конфигурация middleware
+// Configure middleware pipeline
 app.UseRouting();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
 
-// Применение миграций при старте
+// Apply database migrations on application startup
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();

@@ -1,24 +1,22 @@
-﻿using API_server.Data;
-using API_server.Models;
-using System.Xml.Linq;
-
-namespace API_server.Controllers
+﻿namespace API_server.Controllers
 {
+    // A background service responsible for periodically fetching and updating weather data
     public class WeatherUpdateService : BackgroundService
     {
         private readonly IServiceScopeFactory _scopeFactory;
         private TimeSpan _updateInterval;
         private CancellationTokenSource _cts;
-        private bool _isFirstRun; // Флаг для первого запуска
+        private bool _isFirstRun;
 
         public WeatherUpdateService(IServiceScopeFactory scopeFactory)
         {
             _scopeFactory = scopeFactory;
-            _updateInterval = TimeSpan.FromMinutes(60); // Начальная частота - каждый час
+            _updateInterval = TimeSpan.FromMinutes(60); // Default update frequency set to every hour
             _cts = new CancellationTokenSource();
-            _isFirstRun = true; // Первый запуск привязан к HH:15:00
+            _isFirstRun = true; // Initial run is scheduled for HH:15:00
         }
 
+        // Executing the background task, periodically fetching weather data based on the configured interval
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
@@ -30,15 +28,15 @@ namespace API_server.Controllers
                     TimeSpan delay;
                     if (_isFirstRun)
                     {
-                        delay = CalculateDelayToNextRun(); // Первый запуск в HH:15:00
+                        delay = CalculateDelayToNextRun(); // Schedule the first run at HH:15:00
                         _isFirstRun = false;
                     }
                     else
                     {
-                        delay = _updateInterval; // Последующие запуски с заданным интервалом
+                        delay = _updateInterval; // Subsequent runs use the configured interval
                     }
 
-                    // Ждем фиксированный интервал
+                    // Wait for the calculated delay before fetching data
                     await Task.Delay(delay, linkedCts.Token); 
 
                     using var scope = _scopeFactory.CreateScope();
@@ -47,12 +45,12 @@ namespace API_server.Controllers
                 }
                 catch (TaskCanceledException)
                 {
-                    continue;
+                    continue; // Skip to the next iteration if the task is canceled
                 }
             }
         }
 
-        // Метод для расчета времени до следующего запуска
+        // The delay calculating until the next scheduled run, aligning the first run with HH:15:00.
         private TimeSpan CalculateDelayToNextRun()
         {
             var now = DateTime.Now;
@@ -60,13 +58,14 @@ namespace API_server.Controllers
 
             if (now > nextRun)
             {
+                // Move to the next hour if the current time has passed HH:15:00
                 nextRun = nextRun.AddHours(1);
             }
 
             return nextRun - now;
         }
 
-        // Метод для изменения интервала
+        // A new update interval setting and restarting the scheduling process
         public void SetUpdateInterval(int minutes)
         {
             if (minutes <= 0)
@@ -74,11 +73,13 @@ namespace API_server.Controllers
                 throw new ArgumentException("Interval must be greater than 0 minutes.");
             }
             _updateInterval = TimeSpan.FromMinutes(minutes);
-            _cts.Cancel();
+            _cts.Cancel(); // Cancel the current delay
             _cts.Dispose();
-            _cts = new CancellationTokenSource();
-            _isFirstRun = false; // После изменения интервала больше не привязываемся к HH:15:00
+            _cts = new CancellationTokenSource(); // Create a new cancellation token source
+            _isFirstRun = false; // After changing the interval, no longer align with HH:15:00
         }
+
+        // Stopping the background service and disposing the cancellation token source
         public override async Task StopAsync(CancellationToken cancellationToken)
         {
             _cts.Cancel();

@@ -6,17 +6,22 @@
         xmlns:local="clr-namespace:CourierApp"
         mc:Ignorable="d"
         Title="AdminWindow" Height="450" Width="900">
+    <!-- Admin window for managing base fees (tariffs) in the CourierApp application -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
+        
         <TextBlock Text="Base fee management" FontSize="20" FontWeight="Bold" Margin="20,15,539,379" Grid.RowSpan="2"/>
+
+        <!-- Button panel for tariff management actions -->
         <StackPanel Orientation="Horizontal" Margin="15,55,648,335">
             <Button Content="Add New" Click="AddButton_Click" Margin="5"/>
             <Button Content="Refresh" Click="RefreshButton_Click" Margin="5"/>
         </StackPanel>
 
+        <!-- DataGrid for displaying and editing tariffs -->
         <DataGrid x:Name="tariffsGrid" Margin="20,100,418,161" 
                   AutoGenerateColumns="False" IsReadOnly="False"
                   CellEditEnding="TariffsGrid_CellEditEnding">
@@ -44,6 +49,7 @@
                 <DataGridTextColumn Header="Scooter Price" Binding="{Binding PriceForScooter}"/>
                 <DataGridTextColumn Header="Bicycle Price" Binding="{Binding PriceForBicycle}"/>
                 <DataGridTemplateColumn>
+                    <!-- Custom column for delete action -->
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <Button Content="Delete" Click="DeleteButton_Click" 

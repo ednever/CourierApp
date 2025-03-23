@@ -1,9 +1,5 @@
-﻿using API_server.Data;
-using API_server.Models;
+﻿using API_server.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Xml.Linq;
-
 
 namespace API_server.Controllers
 {
@@ -11,7 +7,9 @@ namespace API_server.Controllers
     [ApiController]
     public class WeatherController : ControllerBase
     {
+        // Separate service for working with weather data
         private readonly IWeatherDataService _weatherDataService;
+        // Separate service for working with data update frequency
         private readonly IWeatherUpdateFrequencyService _weatherUpdateFrequencyService;
 
         public WeatherController(IWeatherDataService weatherDataService, IWeatherUpdateFrequencyService weatherUpdateFrequencyService)

@@ -6,14 +6,17 @@
         xmlns:local="clr-namespace:CourierApp"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="900">
+    <!-- Main window for the CourierApp application, providing a UI for delivery cost calculation and weather data display -->
 
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" MinHeight="44"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
+        
         <TextBlock Text="Delivery Cost Calculator" FontSize="20" FontWeight="Bold" Margin="20,10,515,353" Grid.Row="0"/>
-        <!-- Выбор города -->
+
+        <!-- City selection section -->
         <TextBlock Text="Select City:" Margin="20,63,685,309" FontSize="14"/>
         <ComboBox x:Name="CityComboBox" Margin="101,62,685,310">
             <ComboBoxItem Content="Tallinn"/>
@@ -21,11 +24,11 @@
             <ComboBoxItem Content="Pärnu"/>
         </ComboBox>
 
-        <!-- Выбор транспорта -->
+        <!-- Transport selection section -->
         <TextBlock Text="Select Transport:" Margin="20,109,648,263" FontSize="14"/>
-        <!-- Панель с квадратами -->
+        <!-- Horizontal panel containing clickable transport options --> 
         <StackPanel Orientation="Horizontal"  Margin="10,109,459,180">
-            <!-- Квадрат для машины -->
+            <!-- Car option -->
             <Border x:Name="CarBorder" Width="60" Height="60" Margin="5" Background="LightGray" CornerRadius="10"
             BorderThickness="2" BorderBrush="Transparent" MouseDown="TransportBorder_MouseDown">
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Height="50" Width="50">
@@ -35,7 +38,7 @@
                 <Border.Tag>Car</Border.Tag>
             </Border>
 
-            <!-- Квадрат для самоката -->
+            <!-- Scooter option -->
             <Border x:Name="ScooterBorder" Width="60" Height="60" Margin="5" Background="LightGray" CornerRadius="10"
             BorderThickness="2" BorderBrush="Transparent" MouseDown="TransportBorder_MouseDown">
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -45,7 +48,7 @@
                 <Border.Tag>Scooter</Border.Tag>
             </Border>
 
-            <!-- Квадрат для велосипеда -->
+            <!-- Bicycle option -->
             <Border x:Name="BicycleBorder" Width="60" Height="60" Margin="5" Background="LightGray" CornerRadius="10"
             BorderThickness="2" BorderBrush="Transparent" MouseDown="TransportBorder_MouseDown">
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
@@ -56,11 +59,11 @@
             </Border>
         </StackPanel>
 
-        <!-- Кнопка для запроса и отображение результата -->
+        <!-- Calculate button and result display -->
         <Button x:Name="CalculateButton" Content="Calculate Cost" Click="CalculateButton_Click" Margin="101,222,685,155"/>
         <TextBlock x:Name="ResultTextBlock" Text="Result: " FontSize="14" Margin="20,260,515,0" VerticalAlignment="Top" Height="92" TextWrapping="Wrap"/>
 
-        <!-- Изменение частоты запроса -->
+        <!--  Weather data update frequency configuration -->
         <TextBlock Text="Weather data request configuration" FontSize="16" FontWeight="Bold" Margin="499,246,94,117"/>
         <StackPanel Orientation="Horizontal" Grid.Row="0" Margin="490,288,34,71">
             <TextBlock Text="Update frequency (minutes):" Margin="10,0,5,0" VerticalAlignment="Center"/>
@@ -68,17 +71,16 @@
             <Button Content="Set Frequency" Width="153" Height="30" Click="SetFrequencyButton_Click" Margin="5,0,0,0"/>
         </StackPanel>
 
-        <!-- Кнопка для открытия нового окна -->
+        <!-- Button to open the admin window -->
         <Button x:Name="OpenThirdWindowButton" Content="Open Admin Window" Height="30" Click="OpenAdminWindowButton_Click" Margin="19,357,685,10"/>
 
-        <!-- Таблица для отображения данных погоды -->
+        <!-- Weather data display table -->
         <Border Margin="308,14,0,171" BorderBrush="Gray" BorderThickness="1" CornerRadius="5" HorizontalAlignment="Left" Width="570">
             <StackPanel Margin="9,9,9,-9">
                 <TextBlock Text="Weather (Update every HH:15:00)" FontSize="16" FontWeight="Bold" Margin="10,5" HorizontalAlignment="Center"/>
                 <DataGrid x:Name="WeatherDataGrid" AutoGenerateColumns="False" Width="545" Height="150" Margin="5"
                           CanUserAddRows="False" IsReadOnly="True" GridLinesVisibility="None" HeadersVisibility="Column" RenderTransformOrigin="0.496,0.482">
                     <DataGrid.Resources>
-                        <!-- Стили для заголовков (теперь это строки) -->
                         <Style TargetType="DataGridRowHeader">
                             <Setter Property="Background" Value="#FF4A90E2"/>
                             <Setter Property="Foreground" Value="White"/>
@@ -87,7 +89,6 @@
                             <Setter Property="HorizontalContentAlignment" Value="Left"/>
                             <Setter Property="Width" Value="150"/>
                         </Style>
-                        <!-- Стили для строк -->
                         <Style TargetType="DataGridRow">
                             <Setter Property="Background" Value="White"/>
                             <Style.Triggers>
@@ -99,7 +100,6 @@
                                 </Trigger>
                             </Style.Triggers>
                         </Style>
-                        <!-- Стили для ячеек -->
                         <Style TargetType="DataGridCell">
                             <Setter Property="Padding" Value="5"/>
                             <Setter Property="BorderThickness" Value="0"/>
@@ -117,6 +117,8 @@
 
             </StackPanel>
         </Border>
+
+        <!-- Button to manually load weather data -->
         <Button x:Name="LoadData" Content="Load data" Height="20" Click="LoadDataButton_Click" Margin="322,29,492,348" />
     </Grid>
 </Window>
