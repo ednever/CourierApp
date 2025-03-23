@@ -17,6 +17,12 @@ Also check .NET SDK 8.0 installation in CMD:
 dotnet --list-sdks
 ```
 
+***P.S - Just in case check Visual Studio Configurations:***
+
+Tools > Options >
+
+![image](https://github.com/user-attachments/assets/6d0766bb-9e26-4f18-8081-9449ca1086cc)
+
 2️⃣ Open project with Visual Studio
 
 3️⃣ Open CourierApp.sln in folder 📁 CourierApp
