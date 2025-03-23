@@ -16,14 +16,21 @@ namespace API_server.Controllers
             _context = context;
         }
 
-        // GET: api/Tariffs - Получить все тарифы
+        /// <summary>
+        /// Grabs all tariffs like a champ. Returns every city tariff in the house—no weak links here.
+        /// </summary>
+        /// <returns>An ActionResult packed with an enumerable of City objects, delivered with swagger</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<City>>> GetTariffs()
         {
             return await _context.City.ToListAsync();
         }
 
-        // GET: api/Tariffs/5 - Получить тариф по ID
+        /// <summary>
+        /// Snags a tariff by ID with pure finesse. You ask, it delivers—unless that ID’s a ghost.
+        /// </summary>
+        /// <param name="id">The ID of the tariff you’re hunting—better be legit</param>
+        /// <returns>An ActionResult with a City object if it’s found, or a NotFound if you’re out of luck</returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<City>> GetTariff(int id)
         {
@@ -37,7 +44,11 @@ namespace API_server.Controllers
             return tariff;
         }
 
-        // POST: api/Tariffs - Создать новый тариф
+        /// <summary>
+        /// Creates a new tariff like a boss. Drops it into the system with style and a victory lap.
+        /// </summary>
+        /// <param name="tariff">The City object—your new tariff, ready to roll in hot</param>
+        /// <returns>An ActionResult with the created City, plus a slick redirect to prove it’s real</returns>
         [HttpPost]
         public async Task<ActionResult<City>> CreateTariff([FromBody] City tariff)
         {
@@ -52,7 +63,12 @@ namespace API_server.Controllers
             return CreatedAtAction(nameof(GetTariff), new { id = tariff.ID }, tariff);
         }
 
-        // PUT: api/Tariffs/5 - Обновить существующий тариф
+        /// <summary>
+        /// Updates a tariff with swagger and precision. You bring the ID and the juice, it makes it happen.
+        /// </summary>
+        /// <param name="id">The ID of the tariff you’re flexing on—keep it tight</param>
+        /// <param name="tariff">The City object with the fresh updates—don’t sleep on this</param>
+        /// <returns>An IActionResult that’s either a smooth Ok or a BadRequest/NotFound if you slip</returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTariff(int id, [FromBody] City tariff)
         {
@@ -76,7 +92,11 @@ namespace API_server.Controllers
             return Ok();
         }
 
-        // DELETE: api/Tariffs/5 - Удалить тариф
+        /// <summary>
+        /// Deletes a tariff like it’s nothing. Finds it, trashes it, and walks away cool as ever.
+        /// </summary>
+        /// <param name="id">The ID of the tariff you’re kicking to the curb—say goodbye</param>
+        /// <returns>An IActionResult—NoContent if it’s gone, NotFound if it was never there</returns>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTariff(int id)
         {

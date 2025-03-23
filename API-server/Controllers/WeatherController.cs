@@ -20,12 +20,20 @@ namespace API_server.Controllers
             _weatherUpdateFrequencyService = weatherUpdateFrequencyService;
         }
 
+        /// <summary>
+        /// Gets all the weather data like a boss. Returns a list of weather info that'll blow your mind.
+        /// </summary>
+        /// <returns>A slick ActionResult containing an enumerable of Weather objects, served up fresh</returns>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Weather>>> GetWeatherData()
         {
             return Ok(await _weatherDataService.WeatherDataToList());
         }
 
+        /// <summary>
+        /// Loads weather data with style and swagger. Fetches and saves it like a pro.
+        /// </summary>
+        /// <returns>An ActionResult with a Weather object, delivered with finesse</returns>
         [HttpPost]
         public async Task<ActionResult<Weather>> LoadWeatherData()
         {
@@ -33,6 +41,11 @@ namespace API_server.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Sets the update frequency with some serious attitude. You tell it how often, it makes it happen.
+        /// </summary>
+        /// <param name="minutes">The frequency in minutes, because you’re too cool for anything else</param>
+        /// <returns>An ActionResult that’s either a smooth success message or a BadRequest if you mess it up</returns>
         [HttpPost("setfrequency")]
         public ActionResult SetFrequency([FromQuery] int minutes)
         {

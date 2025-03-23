@@ -16,10 +16,15 @@ namespace API_server.Controllers
             _context = context;
         }
 
+        /// <summary>
+        /// Calculates delivery cost like a total rockstar. Takes your request and spits out the slickest price, factoring in weather and vibes.
+        /// </summary>
+        /// <param name="request">The DeliveryRequest object—your VIP pass with city and transport details, no posers allowed</param>
+        /// <returns>An ActionResult with a DeliveryResponse that’s either dripping with success or a BadRequest if you fumble the bag</returns>
         [HttpPost("calculate")]
         public ActionResult<DeliveryResponse> CalculateCost([FromBody] DeliveryRequest request)
         {
-            // Валидация входных параметров
+            // Validation of input parameters
             var validCities = new[] { "Tallinn-Harku", "Tartu-Tõravere", "Pärnu" };
             var validTransports = new[] { "Car", "Scooter", "Bicycle" };
 
@@ -28,7 +33,7 @@ namespace API_server.Controllers
                 return BadRequest("Invalid city or transport");
             }
 
-            // Получаем базовую стоимость из таблицы City
+            // Retrieve base cost from the City table
             var city = _context.City
                 .FirstOrDefault(c => c.Name == request.City);
             if (city == null)
@@ -36,6 +41,7 @@ namespace API_server.Controllers
                 return BadRequest("City not found in database.");
             }
 
+            // Determine base cost based on transport type
             decimal baseCost = request.Transport switch
             {
                 "Car" => city.PriceForCar,
@@ -46,7 +52,7 @@ namespace API_server.Controllers
 
             decimal weatherSurcharge = 0m;
 
-            // Получаем последнюю запись о погоде для города
+            // Retrieve the latest weather data for the city
             var latestWeather = _context.Weather
                 .Where(w => w.StationName == request.City)
                 .OrderByDescending(w => w.Timestamp)
@@ -55,21 +61,21 @@ namespace API_server.Controllers
             if (latestWeather != null)
             {
 
-                // Проверяем погоду для самокатов и велосипедов
+                // Check weather conditions for scooters and bicycles
                 if (request.Transport == "Scooter" || request.Transport == "Bicycle")
                 {
-                    // Проверяем температуру (ATEF)
+                    // Check temperature (ATEF)
                     decimal temperature = latestWeather.AirTemperature;
                     if (temperature < -10m)
                     {
-                        weatherSurcharge = 1m; // Доплата 1€ при температуре ниже -10°C
+                        weatherSurcharge = 1m; // Add 1€ surcharge for temperatures below -10°C
                     }
                     else if (temperature >= -10m && temperature <= 0m)
                     {
-                        weatherSurcharge = 0.5m; // Доплата 0.5€ при температуре от -10°C до 0°C
+                        weatherSurcharge = 0.5m; // Add 0.5€ surcharge for temperatures between -10°C and 0°C
                     }
 
-                    // Проверка погодных явлений (WPEF)
+                    // Check weather phenomena (WPEF)
                     var phenomenon = _context.Phenomenon
                         .FirstOrDefault(p => p.ID == latestWeather.PhenomenonID);
                     if (phenomenon != null)
@@ -86,17 +92,17 @@ namespace API_server.Controllers
                             }
                             else if (snowPhenomena.Contains(phenomenonName))
                             {
-                                weatherSurcharge += 1m; // Доплата 1€ для снежных явлений
+                                weatherSurcharge += 1m; // Add 1€ surcharge for snow-related phenomena
                             }
                             else if (rainPhenomena.Contains(phenomenonName))
                             {
-                                weatherSurcharge += 0.5m; // Доплата 0.5€ для дождевых явлений
+                                weatherSurcharge += 0.5m; // Add 0.5€ surcharge for rain-related phenomena
                             }
                         }
                     }
                 }
 
-                // Проверка скорости ветра только для велосипедов (WSEF)
+                // Check wind speed for bicycles only (WSEF)
                 if (request.Transport == "Bicycle")
                 {
                     decimal windSpeed = latestWeather.WindSpeed;
@@ -106,13 +112,15 @@ namespace API_server.Controllers
                     }
                     else if (windSpeed >= 10m && windSpeed <= 20m)
                     {
-                        weatherSurcharge += 0.5m; // Доплата 0.5€ при скорости ветра от 10 до 20 м/с
+                        weatherSurcharge += 0.5m; // Add 0.5€ surcharge for wind speeds between 10 and 20 m/s
                     }
                 }
             }
 
+            // Calculate total cost
             decimal totalCost = baseCost + weatherSurcharge;
 
+            // Construct response
             var response = new DeliveryResponse
             {
                 Message = $"You chose delivery in {request.City} using {request.Transport}. " +
